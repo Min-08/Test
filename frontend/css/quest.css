@@ -1,0 +1,7 @@
+.quest-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.quest-card { border: 1px solid #e6e8ee; border-radius: 10px; padding: 12px; background: #fff; cursor: pointer; display:flex; justify-content:space-between; align-items:center; }
+.quest-card:hover { background: #f3fbf8; }
+.quest-card .title { font-weight: 600; }
+.quest-card .meta { color: #6b7280; font-size: 12px; }
+.selected-title { font-size: 18px; font-weight: 700; }
+

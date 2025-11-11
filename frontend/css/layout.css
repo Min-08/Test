@@ -1,0 +1,26 @@
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Apple SD Gothic Neo, sans-serif; }
+main.grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.4fr 1.2fr;
+  grid-template-rows: 1fr;
+  gap: 16px;
+  height: 100vh;
+  padding: 16px;
+  background: #f6f7fb;
+}
+.pane { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.detail .progress { height: 12px; background: #eef0f4; border-radius: 6px; overflow: hidden; margin: 12px 0; }
+.detail .bar { height: 100%; width: 0%; background: linear-gradient(90deg, #10a37f, #1cc8a3); transition: width .3s ease; }
+/* shrink quest list font a bit */
+.quest-list .title { font-size: 14px; }
+.quest-list .meta { font-size: 11px; }
+.subject-buttons { display:flex; gap:8px; margin-bottom:8px; }
+.subject-buttons .subject { padding: 8px 12px; border:1px solid #e0e3ea; border-radius: 8px; background:#fff; cursor:pointer; }
+.subject-buttons .subject.active { background:#10a37f; color:#fff; border-color:#10a37f; }
+.current-quest { display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:8px; }
+#current-quest-label { font-size:14px; color:#374151; }
+
+@media (max-width: 1024px) {
+  main.grid { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
+}

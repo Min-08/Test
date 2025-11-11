@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>개인화 학습 퀘스트 플래너</title>
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/quest.css" />
+  <link rel="stylesheet" href="css/mascot.css" />
+  <link rel="stylesheet" href="css/timer.css" />
+  <link rel="stylesheet" href="css/figma-overrides.css" />
+</head>
+<body>
+  <main class="grid">
+    <aside id="quest-pane" class="pane">
+      <h2>퀘스트</h2>
+      <div id="quest-list" class="quest-list"></div>
+    </aside>
+
+    <section id="mascot-pane" class="pane mascot">
+      <div class="mascot-box">
+        <div class="mascot-circle"></div>
+        <p class="mascot-caption">학습 상태에 따라 표정이 바뀝니다 (MVP)</p>
+      </div>
+    </section>
+
+    <section id="detail-pane" class="pane detail">
+      <h2>타이머</h2>
+      <div class="subject-buttons">
+        <button class="subject" data-subject="국어">국어</button>
+        <button class="subject" data-subject="수학">수학</button>
+        <button class="subject" data-subject="영어">영어</button>
+      </div>
+      <div class="timer">
+        <button id="pause">일시정지</button>
+        <button id="stop">초기화</button>
+        <span id="elapsed">00:00:00</span>
+      </div>
+      <div class="current-quest">
+        <div id="current-quest-label">진행 중인 퀘스트 없음</div>
+        <div class="progress"><div class="bar" id="progress-bar"></div></div>
+      </div>
+    </section>
+
+    <button id="ai-btn" class="floating" title="질문하기">
+      <img src="assets/icons/chatgpt_button.svg" alt="AI" />
+    </button>
+    <button id="reset-all" class="floating reset" title="전체 초기화">↺</button>
+  </main>
+
+  <div id="ai-modal" class="modal hidden">
+    <div class="modal-inner">
+      <textarea id="ai-question" placeholder="질문을 입력하세요" rows="5"></textarea>
+      <div class="modal-actions">
+        <select id="ai-subject">
+          <option value="국어">국어</option>
+          <option value="수학">수학</option>
+          <option value="영어">영어</option>
+          <option value="기타">기타</option>
+        </select>
+        <button id="ai-send">보내기</button>
+        <button id="ai-close">닫기</button>
+      </div>
+      <div id="ai-answer" style="margin-top:12px; padding:12px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; white-space:pre-wrap; font-size:14px; line-height:1.4"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/aiButton.js"></script>
+  <script type="module" src="js/quest.js"></script>
+  <script type="module" src="js/timer.js"></script>
+  <script type="module" src="js/api.js"></script>
+  <style>
+    .floating { position: fixed; right: 24px; bottom: 24px; width: 56px; height: 56px; border-radius: 50%; border: none; background: #10a37f; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display:flex; align-items:center; justify-content:center; }
+    .floating img { width: 28px; height: 28px; filter: invert(1); }
+    .floating.reset { right: 24px; bottom: 92px; background: #ef4444; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; }
+    .hidden { display: none; }
+    .modal-inner { background: #fff; width: min(600px, 90vw); padding: 16px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+  </style>
+  </body>
+  </html>

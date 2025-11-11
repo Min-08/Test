@@ -1,0 +1,5 @@
+.mascot { display:flex; align-items:center; justify-content:center; }
+.mascot-box { width: 80%; max-width: 420px; aspect-ratio: 1/1; border-radius: 16px; background: radial-gradient(circle at 30% 30%, #e7f7f2, #ffffff); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.mascot-circle { width: 140px; height: 140px; border-radius: 50%; background: #10a37f; opacity: .85; box-shadow: inset 0 0 0 6px rgba(255,255,255,0.7); }
+.mascot-caption { color: #6b7280; margin-top: 12px; font-size: 12px; }
+
