@@ -9,6 +9,7 @@ from ..models.schemas import QuestionLogIn, QuestionLogOut, SuggestionResponse, 
 from ..models.db_models import QuestionLog, User, Quest, TimerLog
 from ..database import get_db
 from ..services.ai_service import handle_chat
+from ..services.tagging_service import decide_tag_for_subject
 
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -65,16 +66,41 @@ def suggest(user_id: str = Query(...), db: Session = Depends(get_db)):
             Quest.status.in_(["pending", "in_progress"]),
         ).all()
     }
+    # Allowed focus-time options
+    ALLOWED = [25, 50, 90]
     for subj in ["국어", "수학", "영어"]:
         if subj in active_subjects:
             continue
         want = int(daily * float(ratio.get(subj, 0)))
         have = int(minutes_by_subject.get(subj, 0))
-        base = max(20, min(60, max(20, int(want * 0.5))))
+        # choose nearest allowed duration
+        base = min(ALLOWED, key=lambda x: abs(x - max(1, want)))
         add = base
         if have < want * 0.8:
-            add = min(60, base + 10)  # 과소 투자 보정
+            # under-invested → pick next higher allowed if available
+            higher = [x for x in ALLOWED if x > base]
+            add = higher[0] if higher else base
             notes.append(f"{subj}: 최근7일 {have}분 < 목표 {want}분(80%) → +10분 보정")
+        # decide single tag per subject using recent logs
+        tags_en, tags_ko = decide_tag_for_subject(db, user_id, subj)
+        # Avoid suggesting duplicate subject+tag if an active quest already exists with that tag
+        dup = False
+        for r in db.query(Quest).filter(
+            Quest.user_id == user_id,
+            Quest.subject == subj,
+            Quest.type == "time",
+            Quest.status.in_(["pending", "in_progress"]),
+        ).all():
+            try:
+                import json as pyjson
+                existing_ko = pyjson.loads(r.tags_ko_json) if r.tags_ko_json else []
+                if tags_ko and tags_ko[0] in (existing_ko or []):
+                    dup = True
+                    break
+            except Exception:
+                continue
+        if dup:
+            continue
         suggestions.append({
             "id": f"sg_{subj}_{int(datetime.utcnow().timestamp())}",
             "type": "time",
@@ -84,6 +110,8 @@ def suggest(user_id: str = Query(...), db: Session = Depends(get_db)):
             "progress_value": 0,
             "status": "pending",
             "source": "ai_generated",
+            "tags": tags_en,
+            "tags_ko": tags_ko,
         })
 
     return SuggestionResponse(quests=suggestions, notes=notes)

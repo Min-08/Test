@@ -29,4 +29,18 @@ def get_db() -> Generator[Session, None, None]:
 def init_db():
     from .models import db_models  # noqa: F401 ensure models are imported
     Base.metadata.create_all(bind=engine)
+    # Lightweight migration for new columns introduced after initial creation
+    try:
+        with engine.connect() as conn:
+            rows = conn.exec_driver_sql("PRAGMA table_info(quests)").fetchall()
+            cols = [row[1] for row in rows]
+            if "tags_json" not in cols:
+                conn.exec_driver_sql("ALTER TABLE quests ADD COLUMN tags_json TEXT")
+            if "tags_ko_json" not in cols:
+                conn.exec_driver_sql("ALTER TABLE quests ADD COLUMN tags_ko_json TEXT")
+            if "meta_json" not in cols:
+                conn.exec_driver_sql("ALTER TABLE quests ADD COLUMN meta_json TEXT")
+    except Exception:
+        # Ignore migration errors in MVP
+        pass
 

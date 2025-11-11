@@ -11,8 +11,16 @@ class Quest(BaseModel):
     subject: str
     goal_value: int  # minutes target
     progress_value: int = 0
+    # total seconds progress (minutes*60 + remainder), for smooth UI updates
+    progress_seconds: Optional[int] = None
     status: str = Field(default="pending")  # pending | in_progress | completed
     source: str = Field(default="user_defined")
+    # English tags (e.g., ["problem-solving","english-vocabulary","review","english-listening"]) 
+    tags: Optional[List[str]] = None
+    # Korean tags (e.g., ["문제풀이","단어암기(영어)","복습","듣기(영어)"]) 
+    tags_ko: Optional[List[str]] = None
+    # Optional metadata for AI/problem quests (problem text, answer, hints, etc.)
+    meta: Optional[dict] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -50,3 +58,17 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
+
+
+class QuestResultRequest(BaseModel):
+    user_id: str
+    result: str  # 'success' | 'failure'
+
+
+class QuestResultResponse(BaseModel):
+    ok: bool
+
+
+class PatchQuestRequest(BaseModel):
+    status: Optional[str] = None
+    progress_value: Optional[int] = None

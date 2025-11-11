@@ -4,4 +4,7 @@
 .quest-card .title { font-weight: 600; }
 .quest-card .meta { color: #6b7280; font-size: 12px; }
 .selected-title { font-size: 18px; font-weight: 700; }
+.quest-card .actions { display:flex; gap:6px; }
+.quest-card .actions .mini { padding:4px 8px; border:1px solid #e0e3ea; background:#fff; border-radius:6px; cursor:pointer; font-size:12px; }
+.quest-card .problem { margin-top:6px; color:#4b5563; font-size:12px; }
 
