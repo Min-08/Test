@@ -98,3 +98,12 @@ python -m http.server 5500 -d frontend
 ---
 현재 버전은 “학습 3종 + 시간형·문제형 퀘스트 + AI 챗봇”을 안정적으로 돌리는 MVP입니다. 위 TODO를 순차적으로 진행해 완성도를 높여 나갈 예정입니다.
 
+# 1. get-pip.py 스크립트를 다운로드
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+
+# 2. 다운로드한 스크립트를 실행하여 pip 설치
+python get-pip.py
+
+# 3. 설치가 완료되었는지 버전 확인
+python -m pip --version
+
