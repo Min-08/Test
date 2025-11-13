@@ -19,11 +19,12 @@ def summary(user_id: str = Query(...), days: int = Query(7, ge=1, le=30), db: Se
     cutoff = datetime.utcnow() - timedelta(days=days)
 
     # 과목별 총합(분)
+    subject_expr = func.coalesce(TimerLog.subject, Quest.subject)
     rows = (
-        db.query(Quest.subject, func.sum(TimerLog.delta_seconds))
-        .join(Quest, Quest.id == TimerLog.quest_id)
+        db.query(subject_expr.label("subject"), func.sum(TimerLog.delta_seconds))
+        .outerjoin(Quest, Quest.id == TimerLog.quest_id)
         .filter(TimerLog.user_id == user_id, TimerLog.created_at >= cutoff)
-        .group_by(Quest.subject)
+        .group_by(subject_expr)
         .all()
     )
     totals_by_subject: Dict[str, int] = {"국어": 0, "수학": 0, "영어": 0}
@@ -38,10 +39,14 @@ def summary(user_id: str = Query(...), days: int = Query(7, ge=1, le=30), db: Se
         day_start = datetime.combine(d, datetime.min.time())
         day_end = day_start + timedelta(days=1)
         day_rows = (
-            db.query(Quest.subject, func.sum(TimerLog.delta_seconds))
-            .join(Quest, Quest.id == TimerLog.quest_id)
-            .filter(TimerLog.user_id == user_id, TimerLog.created_at >= day_start, TimerLog.created_at < day_end)
-            .group_by(Quest.subject)
+            db.query(subject_expr.label("subject"), func.sum(TimerLog.delta_seconds))
+            .outerjoin(Quest, Quest.id == TimerLog.quest_id)
+            .filter(
+                TimerLog.user_id == user_id,
+                TimerLog.created_at >= day_start,
+                TimerLog.created_at < day_end,
+            )
+            .group_by(subject_expr)
             .all()
         )
         mb = {"국어": 0, "수학": 0, "영어": 0}

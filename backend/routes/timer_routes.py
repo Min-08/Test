@@ -8,6 +8,7 @@ from ..models.schemas import TimerUpdateRequest, Quest as QuestSchema
 from ..models.db_models import Quest as QuestModel, TimerLog, User
 from ..database import get_db
 from ..services.tagging_service import has_active_subject_tag
+from ..services.goal_policy import resolve_goal_minutes, DEFAULT_ALLOWED_MINUTES
 from ..constants import SUBJECTS, STUDY_TAG, STUDY_TAG_KO, SUBJECT_KO_KOREAN
 
 
@@ -86,35 +87,25 @@ def timer_update(payload: TimerUpdateRequest, db: Session = Depends(get_db)):
             if payload.subject not in SUBJECTS:
                 raise HTTPException(status_code=400, detail="Unsupported subject")
 
-            ALLOWED = [25, 50, 90]
             try:
                 ratio = json.loads(user.subject_ratio_json)
             except Exception:
                 ratio = {}
             daily = int(user.daily_minutes_goal or 90)
             want = max(1, int(daily * float(ratio.get(payload.subject, 0))))
-            goal = min(ALLOWED, key=lambda minutes: abs(minutes - want))
+            goal = resolve_goal_minutes(
+                {"preferred": want, "mode": "nearest"},
+                {"allowed_minutes": DEFAULT_ALLOWED_MINUTES},
+            )
 
             tags_en = [STUDY_TAG]
             tags_ko = [STUDY_TAG_KO]
-            if has_active_subject_tag(db, payload.user_id, payload.subject, STUDY_TAG_KO):
-                row = (
-                    db.query(QuestModel)
-                    .filter(
-                        QuestModel.user_id == payload.user_id,
-                        QuestModel.subject == payload.subject,
-                        QuestModel.type == "time",
-                        QuestModel.status.in_(["pending", "in_progress", "paused"]),
-                    )
-                    .order_by(QuestModel.created_at.asc())
-                    .first()
-                )
-                if row is None:
-                    raise HTTPException(status_code=404, detail="Study quest not found")
+            existing_study = has_active_subject_tag(db, payload.user_id, payload.subject, STUDY_TAG_KO)
+            if existing_study:
+                row = existing_study
             else:
-                identifier = f"auto_{payload.subject}_{int(datetime.utcnow().timestamp())}"
                 row = QuestModel(
-                    id=identifier,
+                    id=f"auto_{payload.subject}_{int(datetime.utcnow().timestamp())}",
                     user_id=payload.user_id,
                     type="time",
                     title=f"{payload.subject} 학습 {goal}분",
@@ -127,7 +118,6 @@ def timer_update(payload: TimerUpdateRequest, db: Session = Depends(get_db)):
                 )
                 db.add(row)
                 db.commit()
-                row = db.get(QuestModel, identifier)
 
     if row.status == "completed":
         completed = _quest_schema(row)
@@ -135,14 +125,23 @@ def timer_update(payload: TimerUpdateRequest, db: Session = Depends(get_db)):
         db.commit()
         return completed
 
-    total_seconds = (row.progress_seconds_remainder or 0) + max(0, int(payload.delta_seconds))
+    delta_seconds = max(0, int(payload.delta_seconds))
+    total_seconds = (row.progress_seconds_remainder or 0) + delta_seconds
     inc_minutes = total_seconds // 60
     row.progress_seconds_remainder = total_seconds % 60
     row.progress_minutes = int(row.progress_minutes or 0) + int(inc_minutes)
     row.status = "completed" if row.progress_minutes >= int(row.goal_value or 0) else "in_progress"
     row.updated_at = datetime.utcnow()
 
-    db.add(TimerLog(user_id=payload.user_id, quest_id=row.id, delta_seconds=max(0, int(payload.delta_seconds))))
+    if delta_seconds > 0:
+        db.add(
+            TimerLog(
+                user_id=payload.user_id,
+                quest_id=row.id,
+                subject=row.subject,
+                delta_seconds=delta_seconds,
+            )
+        )
     db.add(row)
     db.commit()
 
@@ -151,4 +150,3 @@ def timer_update(payload: TimerUpdateRequest, db: Session = Depends(get_db)):
         db.delete(row)
         db.commit()
     return result
-

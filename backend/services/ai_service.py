@@ -33,24 +33,31 @@ def _call_openai(messages: list[dict], *, model: Optional[str] = None) -> str:
     except Exception as e:
         return f"[ERROR] AI 호출 실패: {e}"
 
+def _heuristic_subject_and_difficulty(text: str) -> Tuple[str, str, str]:
+    t = text.lower()
+    if any(k in t for k in ["미분", "적분", "방정식", "함수", "matrix", "integral", "derivative", "x^", "sqrt"]):
+        subj = "수학"
+    elif any(ch.isalpha() for ch in t) and sum(ch.isalpha() for ch in t) > max(1, len(t)) * 0.4:
+        subj = "영어"
+    else:
+        subj = "국어"
+    difficulty = "hard" if len(text) > 200 or any(k in t for k in ["증명", "복잡", "어려움"]) else "medium"
+    tier = "full" if difficulty == "hard" else "mini"
+    return subj, difficulty, tier
+
+
 def _classify_subject_and_difficulty(text: str) -> Tuple[str, str, str]:
     """Return (subject, difficulty, tier) where tier in {mini, full}.
     If API key missing or error, fallback to heuristic.
     """
     if not settings.OPENAI_API_KEY:
-        # heuristic fallback
-        t = text.lower()
-        if any(k in t for k in ["미분", "적분", "방정식", "함수", "matrix", "integral", "derivative", "x^", "sqrt"]):
-            subj = "수학"
-        elif any(ch.isalpha() for ch in t) and sum(ch.isalpha() for ch in t) > len(t) * 0.4:
-            subj = "영어"
-        else:
-            subj = "국어"
-        difficulty = "hard" if len(text) > 200 or any(k in t for k in ["증명", "복잡", "어려움"]) else "medium"
-        tier = "full" if difficulty == "hard" else "mini"
-        return subj, difficulty, tier
+        return _heuristic_subject_and_difficulty(text)
 
-    sys = "아래 질문을 보고 과목(국어/수학/영어)과 난이도(easy/medium/hard)를 판단하고, 사용할 모델 티어(mini/full)를 추천하세요. JSON으로만 답하세요. 예: {\"subject\":\"수학\",\"difficulty\":\"hard\",\"tier\":\"full\"}"
+    sys = (
+        "아래 질문을 보고 과목(국어/수학/영어)과 난이도(easy/medium/hard)를 판단하고, "
+        "사용할 모델 티어(mini/full)를 추천하세요. JSON으로만 답하세요. "
+        '예: {"subject":"수학","difficulty":"hard","tier":"full"}'
+    )
     user = text[:4000]
     msg = [{"role": "system", "content": sys}, {"role": "user", "content": user}]
     out = _call_openai(msg, model=settings.OPENAI_MODEL_CLASSIFY)
@@ -67,21 +74,25 @@ def _classify_subject_and_difficulty(text: str) -> Tuple[str, str, str]:
             tier = "mini"
         return subj, diff, tier
     except Exception:
-        # fallback heuristic
-        return _classify_subject_and_difficulty(text)
+        return _heuristic_subject_and_difficulty(text)
 
 
 def handle_chat(user_id: str, text: str, subject: Optional[str] = None, difficulty: Optional[str] = None) -> str:
     # Determine subject/difficulty if missing
-    subj, diff, tier = subject or None, difficulty or None, None
-    if subj is None or diff is None:
+    subj = subject
+    diff = difficulty
+    tier: Optional[str] = None
+    missing_subject = subj is None
+    missing_diff = diff is None
+    if missing_subject or missing_diff:
         subj_c, diff_c, tier_c = _classify_subject_and_difficulty(text)
-        subj = subj or subj_c
-        diff = diff or diff_c
-        tier = tier_c
-    else:
-        # decide tier from provided difficulty
-        tier = "full" if diff == "hard" else "mini"
+        if missing_subject:
+            subj = subj_c
+        if missing_diff:
+            diff = diff_c
+            tier = tier_c
+    if tier is None:
+        tier = "full" if (diff == "hard") else "mini"
 
     # Persist question log
     db = SessionLocal()

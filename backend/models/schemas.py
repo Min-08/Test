@@ -72,3 +72,14 @@ class QuestResultResponse(BaseModel):
 class PatchQuestRequest(BaseModel):
     status: Optional[str] = None
     progress_value: Optional[int] = None
+
+
+class QuestAnswerRequest(BaseModel):
+    user_id: str
+    answer: str
+
+
+class QuestAnswerResponse(BaseModel):
+    correct: bool
+    expected_answer: Optional[str] = None
+    explanation: Optional[str] = None

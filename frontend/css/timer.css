@@ -1,5 +1,5 @@
 .timer { display: flex; align-items: center; gap: 8px; }
-.timer button { padding: 8px 12px; border-radius: 8px; border: 1px solid #e0e3ea; background: #fff; cursor: pointer; }
-.timer button:hover { background: #f0f2f7; }
+.timer button { padding: 8px 12px; border-radius: 8px; border: 1px solid #e0e3ea; background: transparent; cursor: pointer; }
+.timer button:hover { background: rgba(240, 242, 247, 0.5); }
 .timer #elapsed { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
 

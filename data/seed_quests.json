@@ -1,138 +1,133 @@
-[
-  {
-    "id": "qk_study_50",
-    "user_id": "u1",
-    "type": "time",
-    "title": "국어 학습 50분",
-    "subject": "국어",
-    "goal_value": 50,
-    "progress_value": 0,
-    "status": "pending",
-    "source": "ai_generated",
-    "tags_ko": ["학습"],
-    "tags": ["study"],
-    "created_at": "2025-11-11T10:00:00Z",
-    "updated_at": "2025-11-11T10:00:00Z"
+{
+  "_meta": {
+    "description": "Default quests seeded for the single demo user. Update when new quest archetypes are added.",
+    "id_rule": "seed_<subject>_<focus_slug>",
+    "tag_policy": "Tags use lowercase English slugs (see backend/services/tagging_service.TAG_MAP). 새 태그도 동일한 케밥 표기면 허용.",
+    "goal_defaults": {
+      "allowed_minutes": [20, 25, 30, 40, 45, 50, 60, 75, 90],
+      "mode": "nearest",
+      "preferred": 40
+    },
+    "fields": {
+      "id": "Stable quest identifier following id_rule.",
+      "type": "Quest category (time|problem|ai_problem ...).",
+      "title": "Human-readable title rendered in the UI.",
+      "subject": "학습 과목 (국어|수학|영어).",
+      "goal": "Goal policy object. preferred/allowed_minutes/mode(min|max) 등을 정의하면 loader가 goal_value를 자동 계산.",
+      "progress_value": "초기 진행도(분). Usually 0.",
+      "status": "초기 상태. pending/in_progress/paused 등.",
+      "source": "quest 생성 출처. e.g., seed/ai_generated/user_defined.",
+      "tags": "English tag list. Reuse existing slugs or add new ones in lowercase-kebab format.",
+      "meta": "선택적 메타데이터(JSON). 문제형 설명, 정답 등."
+    }
   },
-  {
-    "id": "qm_problem_25",
-    "user_id": "u1",
-    "type": "time",
-    "title": "수학 문제풀이 25분",
-    "subject": "수학",
-    "goal_value": 25,
-    "progress_value": 0,
-    "status": "pending",
-    "source": "ai_generated",
-    "tags_ko": ["문제풀이"],
-    "tags": ["problem-solving"],
-    "created_at": "2025-11-11T10:00:00Z",
-    "updated_at": "2025-11-11T10:00:00Z"
-  },
-  {
-    "id": "qm_study_50",
-    "user_id": "u1",
-    "type": "time",
-    "title": "수학 학습 50분",
-    "subject": "수학",
-    "goal_value": 50,
-    "progress_value": 0,
-    "status": "pending",
-    "source": "ai_generated",
-    "tags_ko": ["학습"],
-    "tags": ["study"],
-    "created_at": "2025-11-11T10:00:00Z",
-    "updated_at": "2025-11-11T10:00:00Z"
-  },
-  {
-    "id": "qe_vocab_25",
-    "user_id": "u1",
-    "type": "time",
-    "title": "영어 단어암기 25분",
-    "subject": "영어",
-    "goal_value": 25,
-    "progress_value": 0,
-    "status": "pending",
-    "source": "ai_generated",
-    "tags_ko": ["단어암기(영어)"],
-    "tags": ["english-vocabulary"],
-    "created_at": "2025-11-11T10:00:00Z",
-    "updated_at": "2025-11-11T10:00:00Z"
-  },
-  {
-    "id": "qe_study_25",
-    "user_id": "u1",
-    "type": "time",
-    "title": "영어 학습 25분",
-    "subject": "영어",
-    "goal_value": 25,
-    "progress_value": 0,
-    "status": "pending",
-    "source": "ai_generated",
-    "tags_ko": ["학습"],
-    "tags": ["study"],
-    "created_at": "2025-11-11T10:00:00Z",
-    "updated_at": "2025-11-11T10:00:00Z"
-  },
-  {
-    "id": "qk_review_25_done",
-    "user_id": "u1",
-    "type": "time",
-    "title": "국어 복습 25분",
-    "subject": "국어",
-    "goal_value": 25,
-    "progress_value": 25,
-    "status": "completed",
-    "source": "ai_generated",
-    "tags_ko": ["복습"],
-    "tags": ["review"],
-    "created_at": "2025-11-10T10:00:00Z",
-    "updated_at": "2025-11-10T10:30:00Z"
-  },
-  {
-    "id": "qm_study_50_done",
-    "user_id": "u1",
-    "type": "time",
-    "title": "수학 학습 50분",
-    "subject": "수학",
-    "goal_value": 50,
-    "progress_value": 50,
-    "status": "completed",
-    "source": "ai_generated",
-    "tags_ko": ["학습"],
-    "tags": ["study"],
-    "created_at": "2025-11-09T10:00:00Z",
-    "updated_at": "2025-11-09T11:00:00Z"
-  },
-  {
-    "id": "qe_listen_25_done",
-    "user_id": "u1",
-    "type": "time",
-    "title": "영어 듣기 25분",
-    "subject": "영어",
-    "goal_value": 25,
-    "progress_value": 25,
-    "status": "completed",
-    "source": "ai_generated",
-    "tags_ko": ["듣기(영어)"],
-    "tags": ["english-listening"],
-    "created_at": "2025-11-08T10:00:00Z",
-    "updated_at": "2025-11-08T10:30:00Z"
-  },
-  {
-    "id": "qe_read_50_done",
-    "user_id": "u1",
-    "type": "time",
-    "title": "영어 독해 50분",
-    "subject": "영어",
-    "goal_value": 50,
-    "progress_value": 50,
-    "status": "completed",
-    "source": "ai_generated",
-    "tags_ko": ["독해(영어)"],
-    "tags": ["english-reading"],
-    "created_at": "2025-11-07T10:00:00Z",
-    "updated_at": "2025-11-07T11:00:00Z"
-  }
-]
-
+  "quests": [
+    {
+      "id": "seed_korean_study",
+      "type": "time",
+      "title": "국어 학습",
+      "subject": "국어",
+      "goal": { "preferred": 50 },
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["study"],
+      "meta": { "category": "daily_goal" }
+    },
+    {
+      "id": "seed_math_problem",
+      "type": "time",
+      "title": "수학 문제풀이",
+      "subject": "수학",
+      "goal": { "preferred": 30, "mode": "ceil" },
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["problem-solving"]
+    },
+    {
+      "id": "seed_math_study",
+      "type": "time",
+      "title": "수학 학습",
+      "subject": "수학",
+      "goal": { "preferred": 50 },
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["study"],
+      "meta": { "category": "daily_goal" }
+    },
+    {
+      "id": "seed_english_reading",
+      "type": "time",
+      "title": "영어 독해",
+      "subject": "영어",
+      "goal": { "preferred": 40 },
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["english-reading"],
+      "meta": { "category": "daily_goal" }
+    },
+    {
+      "id": "seed_english_listening",
+      "type": "time",
+      "title": "영어 듣기",
+      "subject": "영어",
+      "goal": { "preferred": 35 },
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["english-listening"],
+      "meta": { "category": "daily_goal" }
+    },
+    {
+      "id": "seed_english_vocab",
+      "type": "time",
+      "title": "영어 단어암기",
+      "subject": "영어",
+      "goal": { "preferred": 25 },
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["english-vocabulary"],
+      "meta": { "category": "daily_goal" }
+    },
+    {
+      "id": "seed_ai_vocab_test",
+      "type": "problem",
+      "title": "AI 영어 단어 테스트",
+      "subject": "영어",
+      "goal": 0,
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["ai-problem"],
+      "meta": {
+        "category": "ai_problem",
+        "question": "단어 'serene'의 뜻을 한국어로 적으세요.",
+        "correct_answers": ["고요한", "평온한"],
+        "explanation": "serene = 고요하고 평온한 상태",
+        "input_type": "text"
+      }
+    },
+    {
+      "id": "seed_ai_math_calc",
+      "type": "problem",
+      "title": "AI 수학 계산 문제",
+      "subject": "수학",
+      "goal": 0,
+      "progress_value": 0,
+      "status": "pending",
+      "source": "seed",
+      "tags": ["ai-problem"],
+      "meta": {
+        "category": "ai_problem",
+        "question": "다음 식을 계산하세요: 3x + 7 = 22 일 때 x 값은?",
+        "correct_answers": ["5"],
+        "explanation": "3x = 15 → x = 5",
+        "input_type": "text"
+      }
+    }
+  ]
+}

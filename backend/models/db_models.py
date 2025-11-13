@@ -34,7 +34,7 @@ class Quest(Base):
     # meta_json: arbitrary metadata for non-time quests (e.g., AI problem payload)
     meta_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class TimerLog(Base):
@@ -42,6 +42,7 @@ class TimerLog(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     quest_id = Column(String, ForeignKey("quests.id"), nullable=False)
+    subject = Column(String, nullable=True)
     delta_seconds = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 

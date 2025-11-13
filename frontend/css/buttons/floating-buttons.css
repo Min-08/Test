@@ -1,0 +1,46 @@
+.floating {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: none;
+  background: #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.floating img {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+
+.floating-ai {
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.floating-ai img {
+  width: 71px;
+  height: 71px;
+}
+
+.floating,
+.floating-ai {
+  outline: none;
+}
+
+.floating:focus-visible,
+.floating-ai:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.5);
+  outline-offset: 4px;
+}

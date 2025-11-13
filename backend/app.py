@@ -15,6 +15,7 @@ from .constants import (
     SUBJECT_KO_KOREAN,
     DEFAULT_SUBJECT_RATIO_JSON,
 )
+from .seed_loader import load_seed_quests
 
 
 def create_app() -> FastAPI:
@@ -37,7 +38,7 @@ def create_app() -> FastAPI:
             if not user:
                 user = User(
                     id="u1",
-                    display_name="Demo User",
+                    display_name="대한민국 고등학교 3학년",
                     daily_minutes_goal=90,
                     subject_ratio_json=DEFAULT_SUBJECT_RATIO_JSON,
                 )
@@ -49,28 +50,27 @@ def create_app() -> FastAPI:
                 db.commit()
 
             seed_path = Path(__file__).resolve().parents[1] / "data" / "seed_quests.json"
-            if seed_path.exists():
-                with seed_path.open("r", encoding="utf-8") as handle:
-                    quests = json.load(handle)
-                for q in quests:
-                    if db.get(Quest, q["id"]):
-                        continue
-                    db.add(
-                        Quest(
-                            id=q["id"],
-                            user_id=q.get("user_id", "u1"),
-                            type=q.get("type", "time"),
-                            title=q.get("title", "Unnamed Quest"),
-                            subject=q.get("subject", SUBJECT_KO_KOREAN),
-                            goal_value=int(q.get("goal_value", 0)),
-                            progress_minutes=int(q.get("progress_value", 0)),
-                            status=q.get("status", "pending"),
-                            source=q.get("source", "ai_generated"),
-                            tags_json=json.dumps(q.get("tags") or []),
-                            tags_ko_json=json.dumps(q.get("tags_ko") or []),
-                            meta_json=json.dumps(q.get("meta") or {}),
-                        )
+            quests, _meta = load_seed_quests(seed_path)
+            for q in quests:
+                if db.get(Quest, q["id"]):
+                    continue
+                db.add(
+                    Quest(
+                        id=q["id"],
+                        user_id=q.get("user_id", "u1"),
+                        type=q.get("type", "time"),
+                        title=q.get("title", "Unnamed Quest"),
+                        subject=q.get("subject", SUBJECT_KO_KOREAN),
+                        goal_value=int(q.get("goal_value", 0)),
+                        progress_minutes=int(q.get("progress_value", 0)),
+                        status=q.get("status", "pending"),
+                        source=q.get("source", "ai_generated"),
+                        tags_json=json.dumps(q.get("tags") or []),
+                        tags_ko_json=json.dumps(q.get("tags_ko") or []),
+                        meta_json=json.dumps(q.get("meta") or {}),
                     )
+                )
+            if quests:
                 db.commit()
 
             # Any lingering in-progress time quests should start as paused when server boots

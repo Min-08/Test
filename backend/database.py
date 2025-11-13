@@ -40,6 +40,10 @@ def init_db():
                 conn.exec_driver_sql("ALTER TABLE quests ADD COLUMN tags_ko_json TEXT")
             if "meta_json" not in cols:
                 conn.exec_driver_sql("ALTER TABLE quests ADD COLUMN meta_json TEXT")
+            rows = conn.exec_driver_sql("PRAGMA table_info(timer_logs)").fetchall()
+            timer_cols = [row[1] for row in rows]
+            if "subject" not in timer_cols:
+                conn.exec_driver_sql("ALTER TABLE timer_logs ADD COLUMN subject TEXT")
     except Exception:
         # Ignore migration errors in MVP
         pass

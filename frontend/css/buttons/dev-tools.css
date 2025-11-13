@@ -1,0 +1,143 @@
+.dev-button {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  width: 78px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 900;
+}
+
+.dev-button img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dev-panel {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 999;
+}
+
+.dev-panel.hidden {
+  display: none;
+}
+
+.dev-panel__inner {
+  position: relative;
+  width: 307px;
+  height: 461px;
+  margin-left: 113px;
+  margin-top: 709px;
+}
+
+.dev-panel__inner img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+.dev-panel__btn {
+  position: absolute;
+  left: 27px;
+  width: 253px;
+  height: 70px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.dev-panel__btn--quest { top: 92px; }
+.dev-panel__btn--time { top: 162px; }
+.dev-panel__btn--skip { top: 232px; }
+.dev-panel__btn--reset { top: 302px; }
+.dev-panel__btn--exit { top: 372px; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dev-toast-host {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.dev-toast {
+  min-width: 220px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.dev-toast--warning {
+  background: #b91c1c;
+}
+
+.dev-toast--muted {
+  background: #475569;
+}
+
+.dev-toast--hide {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+@media (max-width: 1400px), (max-height: 900px) {
+  .dev-panel {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dev-panel__inner {
+    margin: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .dev-button {
+    left: 16px;
+    bottom: 16px;
+  }
+
+  .dev-panel {
+    padding: 16px;
+  }
+
+  .dev-panel__inner {
+    width: 307px;
+    height: 461px;
+  }
+}

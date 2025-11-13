@@ -82,7 +82,8 @@ def decide_tag_for_subject(db: Session, user_id: str, subject: str, days: int = 
     return [TAG_MAP["학습"]], ["학습"]
 
 
-def has_active_subject_tag(db: Session, user_id: str, subject: str, ko_tag: str) -> bool:
+def has_active_subject_tag(db: Session, user_id: str, subject: str, ko_tag: str) -> Quest | None:
+    """Return the first quest that already uses the requested Korean tag, or None."""
     rows = (
         db.query(Quest)
         .filter(
@@ -97,8 +98,7 @@ def has_active_subject_tag(db: Session, user_id: str, subject: str, ko_tag: str)
         try:
             tags_ko = json.loads(row.tags_ko_json) if row.tags_ko_json else []
             if ko_tag in tags_ko:
-                return True
+                return row
         except Exception:
             continue
-    return False
-
+    return None

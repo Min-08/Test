@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import List
 from datetime import datetime
 import json
+import re
 
 from sqlalchemy.orm import Session
 
@@ -10,6 +11,8 @@ from ..models.schemas import (
     QuestResultRequest,
     QuestResultResponse,
     PatchQuestRequest,
+    QuestAnswerRequest,
+    QuestAnswerResponse,
 )
 from ..models.db_models import Quest as QuestModel, QuestResultLog
 from ..database import get_db
@@ -56,6 +59,19 @@ def _parse_tags(row: QuestModel) -> tuple[set[str], set[str]]:
         except Exception:
             tags_ko = set()
     return tags, tags_ko
+
+
+def _normalized(text: str) -> str:
+    return re.sub(r"\s+", "", (text or "")).lower()
+
+
+def _extract_answers(meta: dict) -> list[str]:
+    answers = meta.get("correct_answers") or meta.get("answer")
+    if isinstance(answers, list):
+        return [str(ans).strip() for ans in answers if str(ans).strip()]
+    if isinstance(answers, str):
+        return [answers.strip()]
+    return []
 
 
 @router.get("", response_model=List[QuestSchema])
@@ -153,3 +169,32 @@ def submit_quest_result(quest_id: str, payload: QuestResultRequest, db: Session 
     db.commit()
     return QuestResultResponse(ok=True)
 
+
+@router.post("/{quest_id}/answer", response_model=QuestAnswerResponse)
+def submit_quest_answer(quest_id: str, payload: QuestAnswerRequest, db: Session = Depends(get_db)):
+    row = db.get(QuestModel, quest_id)
+    if not row or row.user_id != payload.user_id:
+        raise HTTPException(status_code=404, detail="Quest not found")
+    try:
+        meta = json.loads(row.meta_json) if row.meta_json else {}
+    except Exception:
+        meta = {}
+    answers = _extract_answers(meta)
+    if not answers:
+        raise HTTPException(status_code=400, detail="Quest does not accept written answers")
+
+    normalized_expected = {_normalized(ans): ans for ans in answers}
+    normalized_input = _normalized(payload.answer)
+    correct = normalized_input in normalized_expected
+    explanation = meta.get("explanation")
+    expected_display = normalized_expected.get(normalized_input) or answers[0]
+
+    if correct:
+        db.add(QuestResultLog(user_id=payload.user_id, quest_id=quest_id, subject=row.subject, result="success"))
+        db.delete(row)
+        db.commit()
+    else:
+        db.add(QuestResultLog(user_id=payload.user_id, quest_id=quest_id, subject=row.subject, result="failure"))
+        db.commit()
+
+    return QuestAnswerResponse(correct=correct, expected_answer=expected_display, explanation=explanation)
